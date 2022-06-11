@@ -3,16 +3,14 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "enable_create_aad_admin_group" {
-  description = "Whether to create the aad cluster admin group"
-  type        = bool
-  default     = false
-}
-
-variable "acr_scope" {
-  description = "The Resource ID / Scope of the ACR to grant access to"
-  type        = string
-  default     = null
+variable "acr" {
+  description = "The container registry to enable access to"
+  type = object({
+    id                  = string
+    name                = string
+    resource_group_name = string
+  })
+  default = null
 }
 
 variable "nodes_subnet" {
@@ -38,7 +36,7 @@ variable "resource_group" {
 variable "auto_upgrade" {
   description = "Kubernetes Automatic Channel Upgrades"
   type        = string
-  default     = "stable"
+  default     = null
 }
 
 variable "sku_tier" {
@@ -115,6 +113,24 @@ variable "extra_node_pools" {
     enable_node_public_ip = optional(bool)   # Optional
   }))
   default = {}
+}
+
+variable "enable_aad_admin_group" {
+  description = "Whether to create the aad cluster admin group"
+  type        = bool
+  default     = false
+}
+
+variable "enable_acr_integration" {
+  description = "Whether to attach the AKS cluster to an Azure Container Registry"
+  type        = bool
+  default     = false
+}
+
+variable "enable_aad_pod_identity_roles" {
+  description = "Creation of role assignments for pod identities"
+  type        = bool
+  default     = false
 }
 
 variable "enable_log_analytics_workspace" {

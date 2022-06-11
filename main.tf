@@ -2,7 +2,7 @@ data "azurerm_client_config" "current" {}
 
 # AAD K8s Cluster Admin Group in AAD
 resource "azuread_group" "main" {
-  count                   = var.enable_create_aad_admin_group == true ? 1 : 0
+  count                   = var.enable_aad_admin_group ? 1 : 0
   display_name            = "${var.cluster_name}-clusteradmin"
   security_enabled        = true
   prevent_duplicate_names = true
@@ -12,6 +12,11 @@ resource "azuread_group" "main" {
 data "azurerm_resource_group" "nodes_rg" {
   count = var.nodes_subnet != null ? 1 : 0
   name  = var.nodes_subnet.resource_group_name
+}
+
+# The Microsoft Controlled node resource group, used in case no subnet was selected for nodes
+data "azurerm_resource_group" "mc_nodes_rg" {
+  name = azurerm_kubernetes_cluster.main.node_resource_group
 }
 
 # K8s cluster
@@ -46,14 +51,14 @@ resource "azurerm_kubernetes_cluster" "main" {
   }
 
   azure_active_directory_role_based_access_control {
-    managed                = var.enable_create_aad_admin_group
-    admin_group_object_ids = var.enable_create_aad_admin_group == true ? [azuread_group.main[0].id] : null
+    managed                = var.enable_aad_admin_group
+    admin_group_object_ids = var.enable_aad_admin_group == true ? [azuread_group.main[0].id] : null
   }
 
   sku_tier = var.sku_tier
 
   dynamic "oms_agent" {
-    for_each = var.enable_log_analytics_workspace == true ? [1] : []
+    for_each = var.enable_log_analytics_workspace ? [1] : []
     content {
       log_analytics_workspace_id = azurerm_log_analytics_workspace.main[0].id
     }
@@ -96,16 +101,35 @@ resource "azurerm_role_assignment" "network_contributor" {
 
 # Required for manipulating storage accounts in the resource group
 resource "azurerm_role_assignment" "storage_account_contributor" {
-  count                = var.nodes_subnet != null ? 1 : 0
   scope                = var.resource_group.id
   role_definition_name = "Storage Account Contributor"
   principal_id         = azurerm_kubernetes_cluster.main.identity[0].principal_id
 }
 
+# If the resource group supplied is different from the resource group where the nodes are
+# we also give the MIO role in that resource group in case that's where the MI live
+resource "azurerm_role_assignment" "pod_identity_mio_rg" {
+  scope                = var.resource_group.id
+  role_definition_name = "Managed Identity Operator"
+  principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
+}
+
+resource "azurerm_role_assignment" "pod_identity_mio" {
+  scope                = data.azurerm_resource_group.mc_nodes_rg.id
+  role_definition_name = "Managed Identity Operator"
+  principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
+}
+
+resource "azurerm_role_assignment" "pod_identity_vmc" {
+  scope                = data.azurerm_resource_group.mc_nodes_rg.id
+  role_definition_name = "Virtual Machine Contributor"
+  principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
+}
+
 # Grant AcrPull to the Kubernetes Identity
 resource "azurerm_role_assignment" "acr_pull" {
-  count                = var.acr_scope != null ? 1 : 0
-  scope                = var.acr_scope
+  count                = var.enable_acr_integration ? 1 : 0
+  scope                = var.acr.id
   role_definition_name = "AcrPull"
   principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
 }
