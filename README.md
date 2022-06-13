@@ -6,6 +6,8 @@ This terraform module deploys an AKS cluster with optional features:
 - Create the roles for [AAD Pod Identity](https://github.com/Azure/aad-pod-identity)
 - Create a log analytics workspace for the cluster
 
+Some inputs are objects, so either a `data` or `resource` are valid.
+
 * If the the cluster and vnet do not share resource group, remember to follow: https://docs.microsoft.com/en-us/azure/aks/kubernetes-service-principal?tabs=azure-cli#networking (1)
 
 This module uses one experimental feature from Terraform called `module_variable_optional_attrs` which should be released soon (1.3?). Since it is current not completely stabilized, the use of this module requires the following as part of your terraform configuration:
