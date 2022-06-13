@@ -4,9 +4,9 @@ variable "cluster_name" {
 }
 
 variable "acr" {
-  description = "The container registry to enable access to"
+  description = "The container registry to enable access to. Expects a resource or data of `azurerm_container_registry`"
   type = object({
-    id                  = string
+    id                  = optional(string)
     name                = string
     resource_group_name = string
   })
@@ -14,7 +14,7 @@ variable "acr" {
 }
 
 variable "nodes_subnet" {
-  description = "The name of a new or existing subnet where the AKS cluster will be deployed"
+  description = "The name of a new or existing subnet where the AKS cluster nodes will be deployed. Expects a data of `azurerm_subnet`"
   type = object({
     id                   = optional(string)
     name                 = string
@@ -25,9 +25,9 @@ variable "nodes_subnet" {
 }
 
 variable "resource_group" {
-  description = "The name of a new or existing resource group to use."
+  description = "The name of a new or existing resource group to create the AKS cluster under. Expects a resource or data of `azurerm_resource_group`"
   type = object({
-    id       = string
+    id       = optional(string)
     name     = string
     location = string
   })
@@ -36,7 +36,7 @@ variable "resource_group" {
 variable "auto_upgrade" {
   description = "Kubernetes Automatic Channel Upgrades"
   type        = string
-  default     = null
+  default     = "none"
 }
 
 variable "sku_tier" {
@@ -74,7 +74,7 @@ variable "identity_type" {
 }
 
 variable "default_node_pool" {
-  description = "Default node pool in cluster"
+  description = "Default node pool in cluster. Expects a default node pool configuration (from: azurerm_kubernetes_cluster)"
   type = object({
     name                         = string           # Required
     vnet_subnet_id               = optional(string) # Optional
@@ -94,11 +94,11 @@ variable "default_node_pool" {
 }
 
 variable "extra_node_pools" {
-  description = "Additional node pools"
+  description = "Additional node pools. A map of `azurerm_kubernetes_cluster_node_pool` to create and associate with the cluster"
   type = map(object({
     os_type               = optional(string) # Optional. Linux or Windows. Default: Linux
     os_sku                = optional(string) # Optional. Not applicable to Windows os type. Ubuntu or CBLMariner.
-    vnet_subnet_id        = string           # Optional
+    vnet_subnet_id        = optional(string) # Optional
     vm_size               = string           # Required
     min_count             = number           # Only if enable_auto_scaling == true: Required
     node_count            = number           # Only if enable_auto_scaling == true: Optional
