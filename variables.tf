@@ -4,7 +4,7 @@ variable "cluster_name" {
 }
 
 variable "acr" {
-  description = "The container registry to enable access to. Expects a resource or data of `azurerm_container_registry`"
+  description = "The container registry to enable access to. Expects a `resource` or `data` of `azurerm_container_registry`"
   type = object({
     id                  = optional(string)
     name                = string
@@ -14,7 +14,7 @@ variable "acr" {
 }
 
 variable "nodes_subnet" {
-  description = "The name of a new or existing subnet where the AKS cluster nodes will be deployed. Expects a data of `azurerm_subnet`"
+  description = "The name of a new or existing subnet where the AKS cluster nodes will be deployed. Expects a `reource` or `data` of `azurerm_subnet`"
   type = object({
     id                   = optional(string)
     name                 = string
@@ -25,7 +25,7 @@ variable "nodes_subnet" {
 }
 
 variable "resource_group" {
-  description = "The name of a new or existing resource group to create the AKS cluster under. Expects a resource or data of `azurerm_resource_group`"
+  description = "The name of a new or existing resource group to create the AKS cluster under. Expects a `resource` or `data` of `azurerm_resource_group`"
   type = object({
     id       = optional(string)
     name     = string
