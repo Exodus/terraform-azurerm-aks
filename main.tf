@@ -134,7 +134,7 @@ resource "azurerm_role_assignment" "acr_pull" {
 
 resource "azurerm_log_analytics_workspace" "main" {
   count               = var.enable_log_analytics_workspace ? 1 : 0
-  name                = var.cluster_name
+  name                = try(var.log_analytics_workspace_name, var.cluster_name)
   location            = var.resource_group.location
   resource_group_name = var.resource_group.name
   sku                 = var.log_analytics_workspace_sku

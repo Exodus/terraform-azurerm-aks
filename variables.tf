@@ -179,6 +179,12 @@ variable "enable_log_analytics_workspace" {
   default = false
 }
 
+variable "log_analytics_workspace_name" {
+  description = "Name for the log analytics workspace. Will be tied to the cluster name if this is not set."
+  type        = string
+  default     = null
+}
+
 variable "log_analytics_workspace_sku" {
   description = "SKU"
   type        = string
