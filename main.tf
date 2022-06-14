@@ -8,12 +8,6 @@ resource "azuread_group" "main" {
   prevent_duplicate_names = true
 }
 
-# We get the resource group of the default node pool's subnet
-data "azurerm_resource_group" "nodes_rg" {
-  count = var.nodes_subnet != null ? 1 : 0
-  name  = var.nodes_subnet.resource_group_name
-}
-
 # The Microsoft Controlled node resource group, used in case no subnet was selected for nodes
 data "azurerm_resource_group" "mc_nodes_rg" {
   name = azurerm_kubernetes_cluster.main.node_resource_group
@@ -29,7 +23,10 @@ resource "azurerm_kubernetes_cluster" "main" {
   automatic_channel_upgrade = var.auto_upgrade
 
   network_profile {
-    network_plugin = var.network_plugin
+    network_plugin     = var.network_profile.network_plugin
+    service_cidr       = var.network_profile.service_cidr
+    dns_service_ip     = var.network_profile.dns_service_ip
+    docker_bridge_cidr = var.network_profile.docker_bridge_cidr
   }
 
   default_node_pool {
@@ -92,9 +89,10 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
 ###
 
 # Required for creating load balancers in the vnets resource group
+# For the case where the subnet's resource group is different from the main resource group used
 resource "azurerm_role_assignment" "network_contributor" {
-  count                = var.nodes_subnet != null ? 1 : 0
-  scope                = data.azurerm_resource_group.nodes_rg[0].id
+  count                = var.nodes_resource_group != null ? 1 : 0
+  scope                = var.nodes_resource_group.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.main.identity[0].principal_id
 }

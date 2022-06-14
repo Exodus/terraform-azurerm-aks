@@ -3,27 +3,6 @@ variable "cluster_name" {
   type        = string
 }
 
-variable "acr" {
-  description = "The container registry to enable access to. Expects a `resource` or `data` of `azurerm_container_registry`"
-  type = object({
-    id                  = optional(string)
-    name                = string
-    resource_group_name = string
-  })
-  default = null
-}
-
-variable "nodes_subnet" {
-  description = "The name of a new or existing subnet where the AKS cluster nodes will be deployed. Expects a `reource` or `data` of `azurerm_subnet`"
-  type = object({
-    id                   = optional(string)
-    name                 = string
-    virtual_network_name = string
-    resource_group_name  = string
-  })
-  default = null
-}
-
 variable "resource_group" {
   description = "The name of a new or existing resource group to create the AKS cluster under. Expects a `resource` or `data` of `azurerm_resource_group`"
   type = object({
@@ -33,8 +12,35 @@ variable "resource_group" {
   })
 }
 
+variable "nodes_subnet" {
+  description = "The name of an existing subnet where the AKS cluster nodes will be deployed. Expects a `data` of `azurerm_subnet`"
+  type = object({
+    id                   = optional(string)
+    name                 = string
+    virtual_network_name = string
+    resource_group_name  = string
+  })
+  default = null
+}
+
+variable "nodes_resource_group" {
+  description = "Set if the nodes_subnet is in a different resource group from the main resource_group. Expects a `resource` or `data` of `azurerm_resource_group`"
+  type = object({
+    id       = optional(string)
+    name     = string
+    location = string
+  })
+  default = null
+}
+
+variable "kubernetes_version" {
+  description = "Version of Kubernetes specified when creating the AKS managed cluster."
+  type        = string
+  default     = null
+}
+
 variable "auto_upgrade" {
-  description = "Kubernetes Automatic Channel Upgrades"
+  description = "Kubernetes Automatic Channel Upgrades."
   type        = string
   default     = "none"
 }
@@ -45,36 +51,61 @@ variable "sku_tier" {
   default     = "Free"
 }
 
-# variable "vnet_subnet_id" {
-#   description = "The Virtual Network Subnet ID"
-#   type        = string
-# }
+variable "network_profile" {
+  type = object({
+    network_plugin     = string
+    service_cidr       = optional(string)
+    dns_service_ip     = optional(string)
+    docker_bridge_cidr = optional(string)
+  })
+  default = {
+    network_plugin = "azure"
+  }
 
-# variable "vnet_resource_group_id" {
-#   description = "The resource group of the subscription"
-#   type        = string
-# }
-
-variable "kubernetes_version" {
-  description = "Version of Kubernetes specified when creating the AKS managed cluster."
-  type        = string
-  default     = null
+  validation {
+    condition = (
+      var.network_profile.service_cidr != null ||
+      var.network_profile.dns_service_ip != null ||
+      var.network_profile.docker_bridge_cidr != null ?
+      can(join(",", [var.network_profile.service_cidr, var.network_profile.dns_service_ip, var.network_profile.docker_bridge_cidr]))
+      : true
+    )
+    error_message = "service_cidr, dns_service_ip and docker_bridge_cidr must be set together"
+  }
 }
 
-variable "network_plugin" {
-  description = "Network plugin to use for networking. Currently supported values are azure and kubenet. Changing this forces a new resource to be created."
-  type        = string
-  default     = "azure"
-}
+# variable "network_plugin" {
+#   description = "Network plugin to use for networking. Currently supported values are azure and kubenet. Changing this forces a new resource to be created."
+#   type        = string
+#   default     = "azure"
+# }
+
+# variable "service_cidr" {
+#   description = "The Network Range used by the Kubernetes service. Must not collision with the VNet CIDR. Change this if you used a 10.0.0.0/16 VNet CIDR."
+#   type        = string
+#   default     = null
+# }
+
+# variable "dns_service_ip" {
+#   description = "IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns)."
+#   type        = string
+#   default     = null
+# }
+
+# variable "docker_bridge_cidr" {
+#   description = "IP address (in CIDR notation) used as the Docker bridge IP address on nodes."
+#   type        = string
+#   default     = null
+# }
 
 variable "identity_type" {
-  description = "Identity type to use. System or User Assigned"
+  description = "Identity type to use. System or User Assigned."
   type        = string
   default     = "SystemAssigned"
 }
 
 variable "default_node_pool" {
-  description = "Default node pool in cluster. Expects a default node pool configuration (from: azurerm_kubernetes_cluster)"
+  description = "Default node pool in cluster. Expects a default node pool configuration (from: azurerm_kubernetes_cluster)."
   type = object({
     name                         = string           # Required
     vnet_subnet_id               = optional(string) # Optional
@@ -113,6 +144,16 @@ variable "extra_node_pools" {
     enable_node_public_ip = optional(bool)   # Optional
   }))
   default = {}
+}
+
+variable "acr" {
+  description = "The container registry to enable access to. Expects a `resource` or `data` of `azurerm_container_registry`"
+  type = object({
+    id                  = optional(string)
+    name                = string
+    resource_group_name = string
+  })
+  default = null
 }
 
 variable "enable_aad_admin_group" {
