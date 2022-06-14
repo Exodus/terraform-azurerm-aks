@@ -74,30 +74,6 @@ variable "network_profile" {
   }
 }
 
-# variable "network_plugin" {
-#   description = "Network plugin to use for networking. Currently supported values are azure and kubenet. Changing this forces a new resource to be created."
-#   type        = string
-#   default     = "azure"
-# }
-
-# variable "service_cidr" {
-#   description = "The Network Range used by the Kubernetes service. Must not collision with the VNet CIDR. Change this if you used a 10.0.0.0/16 VNet CIDR."
-#   type        = string
-#   default     = null
-# }
-
-# variable "dns_service_ip" {
-#   description = "IP address within the Kubernetes service address range that will be used by cluster service discovery (kube-dns)."
-#   type        = string
-#   default     = null
-# }
-
-# variable "docker_bridge_cidr" {
-#   description = "IP address (in CIDR notation) used as the Docker bridge IP address on nodes."
-#   type        = string
-#   default     = null
-# }
-
 variable "identity_type" {
   description = "Identity type to use. System or User Assigned."
   type        = string
