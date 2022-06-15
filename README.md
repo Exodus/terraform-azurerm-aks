@@ -10,7 +10,7 @@ A terraform module for safely/easily deploying a Kubernetes (AKS) Cluster in Azu
 
 Some inputs are objects, so either a `data` or `resource` are valid.
 
-**Note:** If the the cluster and vnet do not share resource group, provide the `nodes_resource_group` input. This follows: https://docs.microsoft.com/en-us/azure/aks/kubernetes-service-principal?tabs=azure-cli#networking and will assign the Network Contributor role to the cluster's identity in that resource group. This scenario is typical in more complex terraform scenarios, where you've separated state/concern of the base network infrastructure from its utilization in separate resource groups.
+**Note:** If the the cluster and vnet do not share resource group, provide the `vnet_resource_group` input. This follows: https://docs.microsoft.com/en-us/azure/aks/kubernetes-service-principal?tabs=azure-cli#networking and will assign the Network Contributor role to the cluster's identity in that resource group. This scenario is typical in more complex terraform scenarios, where you've separated state/concern of the base network infrastructure from its utilization in separate resource groups.
 
 ## Considerations
 ### Networking

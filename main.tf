@@ -91,8 +91,8 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
 # Required for creating load balancers in the vnets resource group
 # For the case where the subnet's resource group is different from the main resource group used
 resource "azurerm_role_assignment" "network_contributor" {
-  count                = var.nodes_resource_group != null ? 1 : 0
-  scope                = var.nodes_resource_group.id
+  count                = var.vnet_resource_group != null ? 1 : 0
+  scope                = var.vnet_resource_group.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.main.identity[0].principal_id
 }

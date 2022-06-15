@@ -9,7 +9,7 @@ resource "azurerm_resource_group" "main" {
 
 # If we want the nodes to belong to a particular subnet (which is part of a different resource group), we should
 # indicate which resource group that subnet is in.
-data "azurerm_resource_group" "nodes_resource_group" {
+data "azurerm_resource_group" "vnet_resource_group" {
   name = "rg-foo-infra"
 }
 
@@ -34,8 +34,8 @@ module "aks" {
   kubernetes_version = "1.23.5"
   sku_tier           = "paid" # Prod clusters should have higher SLA on the control plane
 
-  nodes_resource_group = data.azurerm_resource_group.nodes_resource_group
-  nodes_subnet         = data.azurerm_subnet.nodes_subnet
+  vnet_resource_group = data.azurerm_resource_group.vnet_resource_group
+  nodes_subnet        = data.azurerm_subnet.nodes_subnet
   network_profile = {
     network_plugin = "azure"
   }

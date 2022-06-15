@@ -34,9 +34,6 @@ module "aks" {
   auto_upgrade       = "stable"
 
   nodes_subnet = azurerm_subnet.nodes_subnet
-  network_profile = {
-    network_plugin = "azure"
-  }
 
   enable_aad_admin_group         = true
   enable_aad_pod_identity_roles  = true

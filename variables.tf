@@ -23,7 +23,7 @@ variable "nodes_subnet" {
   default = null
 }
 
-variable "nodes_resource_group" {
+variable "vnet_resource_group" {
   description = "Set if the nodes_subnet is in a different resource group from the main resource_group. Expects a `resource` or `data` of `azurerm_resource_group`"
   type = object({
     id       = optional(string)
