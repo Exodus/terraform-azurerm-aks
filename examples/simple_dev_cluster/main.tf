@@ -40,6 +40,8 @@ module "aks" {
   enable_acr_integration         = true
   enable_log_analytics_workspace = true
 
+  log_analytics_workspace_name = "foobar-la"
+
   acr = azurerm_container_registry.acr
 
   default_node_pool = {
