@@ -101,7 +101,7 @@ resource "azurerm_role_assignment" "network_contributor" {
 resource "azurerm_role_assignment" "storage_account_contributor" {
   scope                = var.resource_group.id
   role_definition_name = "Storage Account Contributor"
-  principal_id         = azurerm_kubernetes_cluster.main.identity[0].principal_id
+  principal_id         = azurerm_kubernetes_cluster.main.kubelet_identity[0].object_id
 }
 
 # If the resource group supplied is different from the resource group where the nodes are
