@@ -1,16 +1,16 @@
 terraform {
   required_version = "~> 1.0"
 
-  experiments = [module_variable_optional_attrs]
+  # experiments = [module_variable_optional_attrs]
 
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
-      version = "~> 3.10.0"
+      version = "~> 3.26.0"
     }
     azuread = {
       source  = "hashicorp/azuread"
-      version = "~> 2.22.0"
+      version = "~> 2.29.0"
     }
   }
 }
