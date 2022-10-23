@@ -73,6 +73,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "main" {
   max_pods              = each.value.max_pods
   os_disk_size_gb       = each.value.os_disk_size_gb
   os_type               = each.value.os_type
+  os_disk_type          = each.value.os_disk_type
   os_sku                = each.value.os_sku
   orchestrator_version  = each.value.orchestrator_version
   vnet_subnet_id        = try(var.nodes_subnet.id, null)
