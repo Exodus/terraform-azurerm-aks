@@ -60,6 +60,12 @@ resource "azurerm_kubernetes_cluster" "main" {
       log_analytics_workspace_id = azurerm_log_analytics_workspace.main[0].id
     }
   }
+
+  lifecycle {
+    ignore_changes = [
+      oms_agent
+    ]
+  }
 }
 
 # Support to multiple node pools
