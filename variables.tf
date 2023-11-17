@@ -80,6 +80,11 @@ variable "identity_type" {
   default     = "SystemAssigned"
 }
 
+variable "enable_workload_identity" {
+  description = "Specifies whether Azure AD Workload Identity should be enabled for the Cluster. Defaults to false"
+  default     = false
+}
+
 variable "default_node_pool" {
   description = "Default node pool in cluster. Expects a default node pool configuration (from: azurerm_kubernetes_cluster)."
   type = object({

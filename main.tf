@@ -21,6 +21,8 @@ resource "azurerm_kubernetes_cluster" "main" {
   dns_prefix                = var.cluster_name
   kubernetes_version        = var.kubernetes_version
   automatic_channel_upgrade = var.auto_upgrade
+  oidc_issuer_enabled       = var.enable_workload_identity
+  workload_identity_enabled = var.enable_workload_identity
 
   network_profile {
     network_plugin     = var.network_profile.network_plugin
